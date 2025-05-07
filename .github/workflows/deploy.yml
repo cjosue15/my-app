@@ -1,0 +1,38 @@
+name: Deploy static content to Pages
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build app
+        run: npm run build
+
+      - name: Artifact upload
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: github-pages
+          path: dist/my-app/browser
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Github
+        id: deployment
+        uses: actions/deploy-pages@v4 # or specific "vX.X.X" version tag for this action
